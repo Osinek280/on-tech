@@ -327,6 +327,7 @@ nav ul li:hover::after{
 }
   
 .email, .call {
+    white-space: nowrap;
     display: flex;
     align-items: center;
     gap: 20px;
@@ -340,6 +341,7 @@ nav ul li:hover::after{
   
 .email i, .call i {
     color: #f44336;
+    text-align: center;
 }
   
 .email, .call {
@@ -491,6 +493,15 @@ nav ul li:hover::after{
 @media only screen and (max-width: 580px) {
     .photos-container#classic {
         gap: 15px;
+    }
+    .email, .call {
+        font-size: 15px;
+    }
+    .email i , .call i {
+        font-size: 20px;
+    }
+    .right {
+        margin-top: 15px;
     }
 }
 
