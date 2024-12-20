@@ -63,12 +63,12 @@ export default function Comparison() {
                     <FeatureElement feature={feature} key={index} />
                   ))}
                 </ul>
-                <ImageGrid images={section.images} />
+                <ImageGrid images={section.images} />sss
               </div>
             </div>
             ))}
           </dl>
-        </div>
+        </div>``
       </div>
     </div>
   )
