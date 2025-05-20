@@ -1,22 +1,38 @@
-import { Cap, Connector } from '@/constants'
-import Image from 'next/image'
+import { Cap, Connector } from "@/constants";
+import Image from "next/image";
 
-export default function Accessories({title, connectors, caps}: {title: string, connectors: Connector[], caps: Cap[]}) {
+export default function Accessories({
+  title,
+  connectors,
+  caps,
+}: {
+  title: string;
+  connectors: Connector[];
+  caps: Cap[];
+}) {
   return (
     <section className="bg-background py-16 sm:py-24">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold tracking-tight text-foreground mb-8">{title}</h2>
+        <h2 className="text-3xl font-bold tracking-tight text-foreground mb-8">
+          {title}
+        </h2>
 
         <div className="space-y-12">
-          <ProductGrid title="Connectors" products={connectors} />
-          <ProductGrid title="Caps" products={caps} />
+          <ProductGrid title="Łączniki" products={connectors} />
+          <ProductGrid title="Zaślepki" products={caps} />
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-function ProductGrid({ title, products }: { title: string, products: (Connector | Cap)[] }) {
+function ProductGrid({
+  title,
+  products,
+}: {
+  title: string;
+  products: (Connector | Cap)[];
+}) {
   return (
     <div>
       <h3 className="text-2xl font-semibold text-foreground mb-6">{title}</h3>
@@ -26,7 +42,7 @@ function ProductGrid({ title, products }: { title: string, products: (Connector 
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 function ProductCard({ product }: { product: Connector | Cap }) {
@@ -53,6 +69,5 @@ function ProductCard({ product }: { product: Connector | Cap }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
-
