@@ -4,6 +4,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
+import { Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,10 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-
-// Dostępne głębokości
-const classicAvailable = [150, 200, 250, 300];
-const softLineAvailable = [160, 210, 260, 310];
+import { classicAvailable, softLineAvailable } from "@/constants";
 
 // Opcje kolorów
 const colors = [
@@ -103,8 +101,10 @@ export default function PricingCalculator() {
         price,
       },
     ]);
+  };
 
-    form.reset();
+  const deleteItem = (index: number) => {
+    setItems((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -271,11 +271,37 @@ export default function PricingCalculator() {
                           item.color}
                       </td>
                       <td className="px-4 py-2 border">{item.length}</td>
-                      <td className="px-4 py-2 border">{item.price}</td>
+                      <td className="px-4 py-2 border">
+                        <div className="flex items-center justify-between">
+                          <span>{item.price}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteItem(idx)}
+                            className="text-red-600 hover:text-red-800 hover:bg-red-50 ml-2 h-6 w-6 p-0"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <div className="bg-gray-100 px-4 py-2 rounded-lg">
+                <span className="text-lg font-semibold">
+                  Suma całkowita:{" "}
+                  {items
+                    .reduce(
+                      (total, item) => total + Number.parseFloat(item.price),
+                      0
+                    )
+                    .toFixed(2)}{" "}
+                  zł
+                </span>
+              </div>
             </div>
           </div>
         )}
