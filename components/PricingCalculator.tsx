@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
@@ -23,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 
-// Typy dostępnych głębokości
+// Dostępne głębokości
 const classicAvailable = [150, 200, 250, 300];
 const softLineAvailable = [160, 210, 260, 310];
 
@@ -50,15 +51,25 @@ const calculatePrice = ({
   return (basePrice * length * colorMultiplier).toFixed(2);
 };
 
-// Schemat walidacji Zod
+// Schemat walidacji
 const formSchema = z.object({
   type: z.string().nonempty({ message: "Proszę wybrać typ." }),
   depth: z.string().nonempty({ message: "Proszę wybrać głębokość." }),
   color: z.string().nonempty({ message: "Proszę wybrać kolor." }),
-  length: z.string().min(0.1, { message: "Długość musi być większa niż 0." }),
+  length: z.string().min(1, { message: "Długość musi być większa niż 0." }),
 });
 
 export default function PricingCalculator() {
+  const [items, setItems] = useState<
+    {
+      type: string;
+      depth: string;
+      color: string;
+      length: string;
+      price: string;
+    }[]
+  >([]);
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -70,7 +81,8 @@ export default function PricingCalculator() {
   });
 
   const type = useWatch({ control: form.control, name: "type" });
-  const availableDepths = type === "softline" ? softLineAvailable : classicAvailable;
+  const availableDepths =
+    type === "softline" ? softLineAvailable : classicAvailable;
 
   const onSubmit = (data: {
     type: string;
@@ -83,7 +95,16 @@ export default function PricingCalculator() {
       color: data.color,
       length: Number(data.length),
     });
-    alert(`Szacowana cena: ${price} zł`);
+
+    setItems((prev) => [
+      ...prev,
+      {
+        ...data,
+        price,
+      },
+    ]);
+
+    form.reset();
   };
 
   return (
@@ -102,7 +123,7 @@ export default function PricingCalculator() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="flex space-x-4">
-                {/* Wybór typu */}
+                {/* Typ */}
                 <div className="flex-1">
                   <FormField
                     control={form.control}
@@ -111,14 +132,19 @@ export default function PricingCalculator() {
                       <FormItem>
                         <FormLabel>Typ</FormLabel>
                         <FormControl>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
                             <SelectTrigger>
                               <SelectValue placeholder="Wybierz typ" />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectGroup>
                                 <SelectItem value="classic">Classic</SelectItem>
-                                <SelectItem value="softline">Softline</SelectItem>
+                                <SelectItem value="softline">
+                                  Softline
+                                </SelectItem>
                               </SelectGroup>
                             </SelectContent>
                           </Select>
@@ -129,52 +155,29 @@ export default function PricingCalculator() {
                   />
                 </div>
 
-                {/* Wybór koloru */}
+                {/* Głębokość */}
                 <div className="flex-1">
-                <FormField
-                control={form.control}
-                name="depth"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Głębokość (mm)</FormLabel>
-                    <FormControl>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Wybierz głębokość" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {availableDepths.map((depth) => (
-                            <SelectItem key={depth} value={depth.toString()}>
-                              {depth} mm
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-                  
-                </div>
-              </div>
-
-              {/* Wybór głębokości */}
-              <FormField
+                  <FormField
                     control={form.control}
-                    name="color"
+                    name="depth"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Kolor</FormLabel>
+                        <FormLabel>Głębokość (mm)</FormLabel>
                         <FormControl>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
                             <SelectTrigger>
-                              <SelectValue placeholder="Wybierz kolor" />
+                              <SelectValue placeholder="Wybierz głębokość" />
                             </SelectTrigger>
                             <SelectContent>
-                              {colors.map((color) => (
-                                <SelectItem key={color.value} value={color.value}>
-                                  {color.label}
+                              {availableDepths.map((depth) => (
+                                <SelectItem
+                                  key={depth}
+                                  value={depth.toString()}
+                                >
+                                  {depth} mm
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -184,8 +187,39 @@ export default function PricingCalculator() {
                       </FormItem>
                     )}
                   />
+                </div>
+              </div>
 
-              {/* Wprowadzenie długości */}
+              {/* Kolor */}
+              <FormField
+                control={form.control}
+                name="color"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Kolor</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Wybierz kolor" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {colors.map((color) => (
+                            <SelectItem key={color.value} value={color.value}>
+                              {color.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Długość */}
               <FormField
                 control={form.control}
                 name="length"
@@ -206,11 +240,45 @@ export default function PricingCalculator() {
               />
 
               <Button type="submit" className="w-full">
-                Oblicz cenę
+                Dodaj
               </Button>
             </form>
           </Form>
         </div>
+
+        {/* Lista dodanych pozycji */}
+        {items.length > 0 && (
+          <div className="mt-10 max-w-2xl mx-auto">
+            <h3 className="text-xl font-semibold mb-4">Dodane pozycje:</h3>
+            <div className="overflow-x-auto">
+              <table className="min-w-full bg-white border border-gray-200">
+                <thead>
+                  <tr className="bg-gray-100 text-left text-sm font-medium text-gray-700">
+                    <th className="px-4 py-2 border">Typ</th>
+                    <th className="px-4 py-2 border">Głębokość</th>
+                    <th className="px-4 py-2 border">Kolor</th>
+                    <th className="px-4 py-2 border">Długość (m)</th>
+                    <th className="px-4 py-2 border">Cena (zł)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((item, idx) => (
+                    <tr key={idx} className="text-sm">
+                      <td className="px-4 py-2 border">{item.type}</td>
+                      <td className="px-4 py-2 border">{item.depth} mm</td>
+                      <td className="px-4 py-2 border">
+                        {colors.find((c) => c.value === item.color)?.label ??
+                          item.color}
+                      </td>
+                      <td className="px-4 py-2 border">{item.length}</td>
+                      <td className="px-4 py-2 border">{item.price}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

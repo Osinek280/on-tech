@@ -10,11 +10,13 @@ export default function Hero() {
             <span className="block">Wysokiej jakości parapety</span>
             <span className="block text-indigo-600">Classic i Softline</span>
           </h1>
-          <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-            Odkryj naszą gamę wysokiej jakości aluminiowych parapetów. Wybierz między wzorami Classic i Softline, aby idealnie dopasować je do Twoich okien.
+          <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl">
+            Odkryj naszą gamę wysokiej jakości aluminiowych parapetów. <br />{" "}
+            md:max-w-3xl Wybierz między wzorami Classic i Softline, aby idealnie
+            dopasować je do Twoich okien.
           </p>
         </div>
       </div>
     </div>
-  )
+  );
 }

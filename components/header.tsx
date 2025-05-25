@@ -7,7 +7,9 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <span className="text-2xl font-bold text-gray-800 dark:text-white">ON-tech</span>
+              <span className="text-2xl font-bold text-gray-800 dark:text-white">
+                ON-tech
+              </span>
             </div>
             {/* <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               <Link href="#" className="border-indigo-500 text-gray-900 dark:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
@@ -27,6 +29,5 @@ export default function Header() {
         </div>
       </nav>
     </header>
-  )
+  );
 }
-
