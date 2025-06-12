@@ -4,7 +4,7 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Switch } from "@/components/ui/switch";
+// import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,7 +16,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-// import { sendMail } from "@/send-email";
+import { sendMail } from "@/send-email";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -28,7 +28,7 @@ const formSchema = z.object({
   message: z.string().min(10, {
     message: "Wiadomość musi mieć co najmniej 10 znaków.",
   }),
-  attachPricing: z.boolean().default(false),
+  // attachPricing: z.boolean().default(false),
 });
 
 export default function ContactForm() {
@@ -38,7 +38,7 @@ export default function ContactForm() {
       name: "",
       email: "",
       message: "",
-      attachPricing: false,
+      // attachPricing: false,
     },
   });
 
@@ -47,10 +47,9 @@ export default function ContactForm() {
       name: values.name,
       email: values.email,
       message: values.message,
-      quotes: [],
     };
     console.log("Form submitted:", mailData);
-    // sendMail(mailData);
+    sendMail(mailData);
     setSubmitStatus("success");
   }
 
@@ -119,7 +118,7 @@ export default function ContactForm() {
                 )}
               />
 
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="attachPricing"
                 render={({ field }) => (
@@ -138,7 +137,7 @@ export default function ContactForm() {
                     </FormControl>
                   </FormItem>
                 )}
-              />
+              /> */}
 
               <Button type="submit" className="w-full">
                 Wyślij

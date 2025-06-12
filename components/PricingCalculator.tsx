@@ -4,7 +4,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
-import { Trash2 } from "lucide-react";
+import { Package, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +25,15 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { classicAvailable, softLineAvailable } from "@/constants";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Badge } from "./ui/badge";
 
 // Opcje kolorów
 const colors = [
@@ -33,6 +42,36 @@ const colors = [
   { value: "ral-8017", label: "Brąz - RAL 8017 mat" },
   { value: "ral-8019", label: "Ciemny brąz - RAL 8019 mat" },
 ];
+
+const getItemTypeLabel = (itemType: string) => {
+  switch (itemType) {
+    case "parapet":
+      return "Parapet";
+    case "endCap":
+      return "Zaślepka";
+    case "straightConnector":
+      return "Łącznik prosty";
+    case "angleConnector":
+      return "Łącznik kątowy";
+    default:
+      return itemType;
+  }
+};
+
+const getItemUnit = (itemType: string) => {
+  switch (itemType) {
+    case "parapet":
+      return "m";
+    case "endCap":
+      return "szt.";
+    case "straightConnector":
+      return "szt.";
+    case "angleConnector":
+      return "szt.";
+    default:
+      return "szt.";
+  }
+};
 
 // Funkcja obliczająca cenę
 const calculatePrice = ({
@@ -57,6 +96,15 @@ const formSchema = z.object({
   length: z.string().min(1, { message: "Długość musi być większa niż 0." }),
 });
 
+const accessoryFormSchema = z.object({
+  itemType: z.enum(["endCap", "straightConnector", "angleConnector"], {
+    message: "Proszę wybrać typ akcesoriów.",
+  }),
+  type: z.enum(["classic", "softline"], { message: "Proszę wybrać typ." }),
+  depth: z.string().nonempty({ message: "Ilość musi być większa niż 0." }),
+  quantity: z.string().min(1, { message: "Ilość musi być większa niż 0." }),
+});
+
 export default function PricingCalculator() {
   const [items, setItems] = useState<
     {
@@ -77,6 +125,39 @@ export default function PricingCalculator() {
       length: "1",
     },
   });
+
+  const accessoryForm = useForm({
+    resolver: zodResolver(accessoryFormSchema),
+    defaultValues: {
+      itemType: "" as "endCap" | "straightConnector" | "angleConnector",
+      type: "" as "classic" | "softline",
+      depth: "",
+      quantity: "1",
+    },
+  });
+
+  const onAccessorySubmit = () =>
+    // data: z.infer<typeof accessoryFormSchema>
+    {
+      // try {
+      //   const calculatedItem = calculateItemPrice({
+      //     itemType: data.itemType,
+      //     type: data.type,
+      //     depth: Number(data.depth),
+      //     quantity: Number(data.quantity),
+      //   });
+      //   setItems((prev) => [...prev, calculatedItem]);
+      //   // Reset form but keep type and itemType for convenience
+      //   accessoryForm.reset({
+      //     itemType: data.itemType,
+      //     type: data.type,
+      //     depth: "",
+      //     quantity: "1",
+      //   });
+      // } catch (error) {
+      //   console.error("Błąd obliczania ceny:", error);
+      // }
+    };
 
   const type = useWatch({ control: form.control, name: "type" });
   const availableDepths =
@@ -119,131 +200,398 @@ export default function PricingCalculator() {
           </p>
         </div>
 
-        <div className="mt-10 max-w-xl mx-auto">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="flex space-x-4">
-                {/* Typ */}
-                <div className="flex-1">
-                  <FormField
-                    control={form.control}
-                    name="type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Typ</FormLabel>
-                        <FormControl>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Wybierz typ" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectGroup>
-                                <SelectItem value="classic">Classic</SelectItem>
-                                <SelectItem value="softline">
-                                  Softline
-                                </SelectItem>
-                              </SelectGroup>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Formularz */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Plus className="h-5 w-5 mr-2" />
+                Dodaj pozycję
+              </CardTitle>
+              <CardDescription>
+                Wybierz typ pozycji i wypełnij formularz
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="parapet" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="parapet">Parapet</TabsTrigger>
+                  <TabsTrigger value="accessories">Akcesoria</TabsTrigger>
+                </TabsList>
 
-                {/* Głębokość */}
-                <div className="flex-1">
-                  <FormField
-                    control={form.control}
-                    name="depth"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Głębokość (mm)</FormLabel>
-                        <FormControl>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Wybierz głębokość" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {availableDepths.map((depth) => (
-                                <SelectItem
-                                  key={depth}
-                                  value={depth.toString()}
+                <TabsContent value="parapet" className="space-y-4">
+                  <Form {...form}>
+                    <form
+                      onSubmit={form.handleSubmit(onSubmit)}
+                      className="space-y-4"
+                    >
+                      <div className="grid grid-cols-2 gap-4">
+                        {/* Typ */}
+                        <FormField
+                          control={form.control}
+                          name="type"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Typ</FormLabel>
+                              <FormControl>
+                                <Select
+                                  onValueChange={(value) => {
+                                    field.onChange(value);
+                                    form.setValue("depth", "");
+                                  }}
+                                  value={field.value}
                                 >
-                                  {depth} mm
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Wybierz typ" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectGroup>
+                                      <SelectItem value="classic">
+                                        Classic
+                                      </SelectItem>
+                                      <SelectItem value="softline">
+                                        Softline
+                                      </SelectItem>
+                                    </SelectGroup>
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-              {/* Kolor */}
-              <FormField
-                control={form.control}
-                name="color"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Kolor</FormLabel>
-                    <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Wybierz kolor" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {colors.map((color) => (
-                            <SelectItem key={color.value} value={color.value}>
-                              {color.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                        {/* Głębokość */}
+                        <FormField
+                          control={form.control}
+                          name="depth"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Głębokość (mm)</FormLabel>
+                              <FormControl>
+                                <Select
+                                  onValueChange={field.onChange}
+                                  value={field.value}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Wybierz głębokość" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {availableDepths.map((depth) => (
+                                      <SelectItem
+                                        key={depth}
+                                        value={depth.toString()}
+                                      >
+                                        {depth} mm
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
-              {/* Długość */}
-              <FormField
-                control={form.control}
-                name="length"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Długość (m)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        {...field}
-                        placeholder="Wprowadź długość"
+                      {/* Kolor */}
+                      <FormField
+                        control={form.control}
+                        name="color"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Kolor</FormLabel>
+                            <FormControl>
+                              <Select
+                                onValueChange={field.onChange}
+                                value={field.value}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Wybierz kolor" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {colors.map((color) => (
+                                    <SelectItem
+                                      key={color.value}
+                                      value={color.value}
+                                    >
+                                      {color.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
-              <Button type="submit" className="w-full">
-                Dodaj
-              </Button>
-            </form>
-          </Form>
+                      {/* Długość */}
+                      <FormField
+                        control={form.control}
+                        name="length"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Długość (m)</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                step="0.01"
+                                min="0.01"
+                                {...field}
+                                placeholder="1.00"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <Button type="submit" className="w-full">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Dodaj parapet
+                      </Button>
+                    </form>
+                  </Form>
+                </TabsContent>
+
+                <TabsContent value="accessories" className="space-y-4">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                    <p className="text-sm text-blue-800">
+                      <strong>Uwaga:</strong> Zaślepki i łączniki muszą mieć
+                      taką samą głębokość jak parapet, do którego będą
+                      montowane.
+                    </p>
+                  </div>
+                  <Form {...accessoryForm}>
+                    <form
+                      onSubmit={accessoryForm.handleSubmit(onAccessorySubmit)}
+                      className="space-y-4"
+                    >
+                      {/* Typ akcesoriów */}
+                      <FormField
+                        control={accessoryForm.control}
+                        name="itemType"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Typ akcesoriów</FormLabel>
+                            <FormControl>
+                              <Select
+                                onValueChange={field.onChange}
+                                value={field.value}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Wybierz typ akcesoriów" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectGroup>
+                                    <SelectItem value="endCap">
+                                      Zaślepka
+                                    </SelectItem>
+                                    <SelectItem value="straightConnector">
+                                      Łącznik prosty
+                                    </SelectItem>
+                                    <SelectItem value="angleConnector">
+                                      Łącznik kątowy
+                                    </SelectItem>
+                                  </SelectGroup>
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid grid-cols-2 gap-4">
+                        {/* Typ parapetu */}
+                        <FormField
+                          control={accessoryForm.control}
+                          name="type"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Typ parapetu</FormLabel>
+                              <FormControl>
+                                <Select
+                                  onValueChange={(value) => {
+                                    field.onChange(value);
+                                    accessoryForm.setValue("depth", "");
+                                  }}
+                                  value={field.value}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Wybierz typ" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectGroup>
+                                      <SelectItem value="classic">
+                                        Classic
+                                      </SelectItem>
+                                      <SelectItem value="softline">
+                                        Softline
+                                      </SelectItem>
+                                    </SelectGroup>
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* Głębokość */}
+                        <FormField
+                          control={accessoryForm.control}
+                          name="depth"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Głębokość parapetu (mm)</FormLabel>
+                              <FormControl>
+                                <Select
+                                  onValueChange={field.onChange}
+                                  value={field.value}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Wybierz głębokość" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {availableDepths.map((depth) => (
+                                      <SelectItem
+                                        key={depth}
+                                        value={depth.toString()}
+                                      >
+                                        {depth} mm
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                              <p className="text-xs text-muted-foreground">
+                                Głębokość akcesoriów musi odpowiadać głębokości
+                                parapetu
+                              </p>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      {/* Ilość */}
+                      <FormField
+                        control={accessoryForm.control}
+                        name="quantity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Ilość (szt.)</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="1"
+                                {...field}
+                                placeholder="1"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <Button type="submit" className="w-full">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Dodaj akcesoria
+                      </Button>
+                    </form>
+                  </Form>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+
+          {/* Lista pozycji */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Wycena</CardTitle>
+              <CardDescription>
+                {items.length === 0
+                  ? "Brak pozycji w wycenie"
+                  : `${items.length} ${
+                      items.length === 1
+                        ? "pozycja"
+                        : items.length < 5
+                        ? "pozycje"
+                        : "pozycji"
+                    } w wycenie`}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {items.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>Dodaj pierwszą pozycję aby rozpocząć wycenę</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {items.map((item, i) => (
+                    <div key={i} className="border rounded-lg p-4 bg-white">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant="outline">
+                              ss
+                              {item.type}
+                              {/* {getItemTypeLabel(item.itemType)} */}
+                            </Badge>
+                            <Badge variant="secondary">
+                              {item.type === "classic" ? "Classic" : "Softline"}
+                            </Badge>
+                            <span className="font-medium">{item.depth}mm</span>
+                          </div>
+                          {item.color && (
+                            <p className="text-sm text-gray-600">
+                              {
+                                colors.find((c) => c.value === item.color)
+                                  ?.label
+                              }
+                            </p>
+                          )}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => deleteItem(i)}
+                          className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-4 text-sm mb-2">
+                        <div>
+                          Ilość: {item.length} mm
+                          {/* {getItemUnit(item.itemType)} */}
+                        </div>
+                        <div>Cena jedn.: {item.unitPrice.toFixed(2)} zł</div>
+                        <div className="font-semibold">
+                          Razem: {item.totalPrice.toFixed(2)} zł
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-semibold text-blue-900">
+                        Suma całkowita:
+                      </span>
+                      <span className="text-2xl font-bold text-blue-900">
+                        {totalSum.toFixed(2)} zł
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         {/* Lista dodanych pozycji */}

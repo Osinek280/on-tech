@@ -1,17 +1,14 @@
 "use server";
 import nodemailer from "nodemailer";
-import { Quote } from "./constants";
 
 export async function sendMail({
   name,
   email,
   message,
-  quotes,
 }: {
   name: string;
   email: string;
   message: string;
-  quotes: Quote[];
 }) {
   try {
     const transporter = nodemailer.createTransport({
@@ -30,18 +27,6 @@ export async function sendMail({
       <p><strong>Imię:</strong> ${name}</p>
       <p><strong>Email:</strong> ${email}</p>
       <p><strong>Wiadomość:</strong> ${message}</p>
-      ${quotes
-        .map(
-          (quote) => `
-        <div>
-          <p><strong>Typ:</strong> ${quote.type}</p>
-          <p><strong>Długość:</strong> ${quote.length}</p>
-          <p><strong>Kolor:</strong> ${quote.color}</p>
-          <p><strong>Cena:</strong> ${quote.price}</p>
-        </div>
-      `
-        )
-        .join("")}
     `,
     };
 
