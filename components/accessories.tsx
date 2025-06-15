@@ -1,4 +1,4 @@
-import { Cap, Connector } from "@/constants";
+import { Cap, Connector } from "../constants";
 import Image from "next/image";
 
 export default function Accessories({

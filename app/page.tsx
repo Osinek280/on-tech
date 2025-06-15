@@ -1,16 +1,16 @@
-import Accessories from "@/components/accessories";
-import Comparison from "@/components/comparison";
-import ContactForm from "@/components/contactForm";
-import Footer from "@/components/footer";
-import Header from "@/components/header";
-import Hero from "@/components/hero";
-// import PricingCalculator from "@/components/PricingCalculator";
+import Accessories from "../components/accessories";
+import Comparison from "../components/comparison";
+import ContactForm from "../components/contactForm";
+import Footer from "../components/footer";
+import Header from "../components/header";
+import Hero from "../components/hero";
+
 import {
   classicCaps,
   classicConnectors,
   softlineCaps,
   softlineConnectors,
-} from "@/constants";
+} from "../constants";
 
 export default function Home() {
   return (

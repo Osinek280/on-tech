@@ -1,4 +1,4 @@
-import { classicFeatures, Feature, softlineFeatures } from "@/constants";
+import { classicFeatures, Feature, softlineFeatures } from "../constants";
 import Image from "next/image";
 
 function FeatureElement({ feature }: { feature: Feature }) {

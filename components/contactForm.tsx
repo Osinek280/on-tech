@@ -4,10 +4,9 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-// import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Textarea } from "../components/ui/textarea";
 import {
   Form,
   FormControl,
@@ -15,8 +14,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { sendMail } from "@/send-email";
+} from "../components/ui/form";
+import { sendMail } from "../send-email";
 
 const formSchema = z.object({
   name: z.string().min(2, {
